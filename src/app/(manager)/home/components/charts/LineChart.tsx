@@ -1,15 +1,9 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ICount } from '../../../../../../types/ICharts';
 
-const data = [
-  { name: 'Jan', value: 20 },
-  { name: 'Feb', value: 25 },
-  { name: 'Mar', value: 30 },
-  { name: 'Apr', value: 50 },
-  { name: 'May', value: 60 },
-  { name: 'Jun', value: 45 },
-];
+
 
 // Componente para o ponto oval
 interface CustomDotProps {
@@ -18,7 +12,7 @@ interface CustomDotProps {
   fill?: string;
 }
 
-const OvalDot: React.FC<CustomDotProps> = ({ cx, cy, fill }) => {
+const OvalDot: React.FC<CustomDotProps> = ({ cx, cy, fill,  }) => {
   if (cx === undefined || cy === undefined) return null;
   
   return (
@@ -32,7 +26,34 @@ const OvalDot: React.FC<CustomDotProps> = ({ cx, cy, fill }) => {
   );
 };
 
-const LineChartDashboard: React.FC = () => {
+interface LineChartProps {
+  riskCount?: ICount[]
+}
+const LineChartDashboard: React.FC<LineChartProps> = ({riskCount}) => {
+  
+  console.log(riskCount)
+  const [data, setData] = useState<{ name: string; value: number }[]>([]);
+
+  const formatData = (riskCount: ICount[] = [], year: string) => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+    return riskCount
+      .filter(item => item.month.startsWith(year))
+      .map(item => {
+        const monthIndex = parseInt(item.month.split('-')[1], 10) - 1;
+        return {
+          name: monthNames[monthIndex],
+          value: item.value
+        };
+      });
+  };
+
+  const currentYear: string = new Date().getFullYear().toString();
+
+  useEffect(() => {
+    const formattedData = formatData(riskCount || [], currentYear);
+    setData(formattedData);
+  }, [riskCount, currentYear]);
+
   return (
     <div className="p-4 bg-white rounded-lg shadow-md w-full h-[400px]">
       <div className="flex justify-between items-center mb-4">
@@ -58,7 +79,7 @@ const LineChartDashboard: React.FC = () => {
             dataKey="value"
             stroke="#4c9aff"
             strokeWidth={2}
-            dot={<OvalDot fill="#4c9aff" />} // Aplicando o ponto oval personalizado
+            dot={<OvalDot fill="#4c9aff" />}
             activeDot={{ r: 6, stroke: '#4c9aff', strokeWidth: 2 }}
           />
         </LineChart>

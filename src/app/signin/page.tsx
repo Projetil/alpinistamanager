@@ -11,24 +11,40 @@ import NewPassword from "./password-fluxo/components/pass-3/NewPassword";
 import InsertCodeLogin from "./login-fluxo/components/InsertCodeLogin";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DataSchemaSignIn, schemaSignIn } from "./schema";
+import UserService from "@/services/UserService";
+import { toast } from "react-toastify";
+import { LoadingSpinner } from "@/components/default/Spinner";
 
 export default function SignIn() {
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [resetPassword, setResetPassword] = useState(false);
   const [insertCode, setInsertCode] = useState(false);
   const [newPassword, setNewPassword] = useState(false);
   const router = useRouter();
   const [insertCodeLogin, setInsertCodeLogin] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<DataSchemaSignIn>({
+    resolver: zodResolver(schemaSignIn),
+  });
 
-  const [email, setEmail] = useState("gestor@teste.com.br");
-  const [password, setPassword] = useState("gestor123");
-
-  const handleLogin = () => {
-    if (email.trim() === "" || password.trim() === "") {
-      alert("Por favor, preencha todos os campos.");
-      return;
+  const onSubmit = async (data: DataSchemaSignIn) => {
+    try {
+      setLoading(true);
+      await UserService.Login(data);
+      setInsertCodeLogin(true);
+    } catch (err) {
+      toast.error("Email ou senha incorretos");
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
-    setInsertCodeLogin(true);
   };
 
   return (
@@ -86,10 +102,7 @@ export default function SignIn() {
                 action="#"
                 method="POST"
                 className="space-y-6 text-[#050506]"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleLogin();
-                }}
+                onSubmit={handleSubmit(onSubmit)}
               >
                 <div>
                   <Label htmlFor="email" className="block font-semibold ">
@@ -97,16 +110,11 @@ export default function SignIn() {
                   </Label>
                   <div className="mt-1">
                     <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      required
+                      {...register("email")}
                       className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-[#E0F3FF] focus:outline-none focus:ring-[#E0F3FF] sm:text-sm"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
+                  {errors.email && <p>{errors.email.message}</p>}
                 </div>
 
                 <div>
@@ -115,14 +123,9 @@ export default function SignIn() {
                   </Label>
                   <div className="mt-1 relative">
                     <Input
-                      id="password"
-                      name="password"
+                      {...register("password")}
                       type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
-                      required
                       className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-[#E0F3FF] focus:outline-none focus:ring-[#E0F3FF] sm:text-sm"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <button
                       type="button"
@@ -139,10 +142,11 @@ export default function SignIn() {
                 </div>
                 <div>
                   <Button
+                    disabled={loading}
                     type="submit"
                     className="flex w-full justify-center rounded-md border border-transparent bg-[#3088EE] py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-[#E0F3FF] focus:outline-none focus:ring-2 hover:text-[#050506] focus:ring-[#E0F3FF] focus:ring-offset-2"
                   >
-                    Entrar
+                    {loading ? <LoadingSpinner /> : "Entrar"}
                   </Button>
                 </div>
                 <div>
@@ -152,12 +156,6 @@ export default function SignIn() {
                     onClick={() => setResetPassword(!resetPassword)}
                   >
                     Esqueci minha senha
-                  </a>
-                </div>
-                <div className="flex gap-1">
-                  <p className="text-sm text-[#636267]">Não tem conta ainda?</p>
-                  <a href="#" className="font-semibold text-sm text-[#3088EE]">
-                    Cadastre-se
                   </a>
                 </div>
               </form>

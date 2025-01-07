@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
-
+import { ToastContainer } from "react-toastify";
 import "./globals.css";
-
+import SessionProvider from "@/components/ui/sessionProvider";
+import "react-toastify/dist/ReactToastify.css";
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -21,7 +22,14 @@ export default function RootLayout({
       <body
         className={`${inter.className} ${montserrat.className} antialiased`}
       >
-        {children}
+        <SessionProvider>
+              <ToastContainer
+                autoClose={3000}
+                hideProgressBar={true}
+                closeOnClick
+              ></ToastContainer>
+              {children}
+        </SessionProvider>
       </body>
     </html>
   );

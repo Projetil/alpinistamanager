@@ -1,57 +1,9 @@
 "use client";
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ICriticity } from '../../../../../../types/ICharts';
 
-const data = [
-  {
-    name: 'Superfície de ataques',
-    Critica: 30,
-    Alta: 20,
-    Media: 10,
-    Baixa: 50,
-    Info: 60,
-  },
-  {
-    name: 'Inteligência de ameaças',
-    Critica: 20,
-    Alta: 25,
-    Media: 15,
-    Baixa: 55,
-    Info: 70,
-  },
-  {
-    name: 'Gestão de vulnerabilidade',
-    Critica: 35,
-    Alta: 22,
-    Media: 17,
-    Baixa: 45,
-    Info: 65,
-  },
-  {
-    name: 'Teste de intrusão',
-    Critica: 40,
-    Alta: 30,
-    Media: 25,
-    Baixa: 35,
-    Info: 75,
-  },
-  {
-    name: 'Terceiros',
-    Critica: 25,
-    Alta: 28,
-    Media: 20,
-    Baixa: 50,
-    Info: 55,
-  },
-  {
-    name: 'Conformidade',
-    Critica: 30,
-    Alta: 35,
-    Media: 15,
-    Baixa: 40,
-    Info: 60,
-  },
-];
+
 
 const colors: { Critica: string; Alta: string; Media: string; Baixa: string; Info: string } = {
   Critica: '#ff6868',
@@ -60,13 +12,65 @@ const colors: { Critica: string; Alta: string; Media: string; Baixa: string; Inf
   Baixa: '#4c9aff',
   Info: '#b0d8ff',
 };
+interface BarChartProps {
+  criticity?: ICriticity[]
+}
+const BarChartDashboard: React.FC<BarChartProps> = ({criticity}) => {
+  const data = [
+    {
+      name: 'Superfície de ataques',
+      Critica: criticity ? criticity[0].critical : 0,
+      Alta: criticity ? criticity[0].high : 0,
+      Media: criticity ? criticity[0].medium : 0,
+      Baixa: criticity ? criticity[0].low : 0,
+      Info: criticity ? criticity[0].info : 0,
+    },
+    {
+      name: 'Inteligência de ameaças',
+      Critica: criticity ? criticity[1].critical : 0,
+      Alta: criticity ? criticity[1].high : 0,
+      Media: criticity ? criticity[1].medium : 0,
+      Baixa: criticity ? criticity[1].low : 0,
+      Info: criticity ? criticity[1].info : 0,
+    },
+    {
+      name: 'Gestão de vulnerabilidade',
+      Critica: criticity ? criticity[2].critical : 0,
+      Alta: criticity ? criticity[2].high : 0,
+      Media: criticity ? criticity[2].medium : 0,
+      Baixa: criticity ? criticity[2].low : 0,
+      Info: criticity ? criticity[2].info : 0,
+    },
+    {
+      name: 'Teste de intrusão',
+      Critica: criticity ? criticity[3].critical : 0,
+      Alta: criticity ? criticity[3].high : 0,
+      Media: criticity ? criticity[3].medium : 0,
+      Baixa: criticity ? criticity[3].low : 0,
+      Info: criticity ? criticity[3].info : 0,
+    },
+    {
+      name: 'Terceiros',
+      Critica: criticity ? criticity[4].critical : 0,
+      Alta: criticity ? criticity[4].high : 0,
+      Media: criticity ? criticity[4].medium : 0,
+      Baixa: criticity ? criticity[4].low : 0,
+      Info: criticity ? criticity[4].info : 0,
+    },
+    {
+      name: 'Conformidade',
+      Critica: criticity ? criticity[5].critical : 0,
+      Alta: criticity ? criticity[5].high : 0,
+      Media: criticity ? criticity[5].medium : 0,
+      Baixa: criticity ? criticity[5].low : 0,
+      Info: criticity ? criticity[5].info : 0,
+    },
+  ];
 
-const BarChartDashboard: React.FC = () => {
   return (
     <div className="p-4 bg-white rounded-lg shadow-md w-full h-[400px]">
       <h2 className="text-lg font-semibold text-gray-700 mb-4">Criticidade vs. Origem/Serviço</h2>
 
-      {/* Legenda personalizada responsiva */}
       <div className="flex flex-wrap justify-center gap-4 mb-4">
         {Object.keys(colors).map((key) => (
           <div key={key} className="flex items-center">
@@ -86,7 +90,7 @@ const BarChartDashboard: React.FC = () => {
             top: 20,
             right: 20,
             left: 20,
-            bottom: 0, // Aumente a margem inferior para acomodar as legendas
+            bottom: 0,
           }}
           barCategoryGap="20%"
         >
@@ -106,7 +110,7 @@ const BarChartDashboard: React.FC = () => {
               dataKey={key} 
               fill={colors[key as keyof typeof colors]} 
               barSize={10} 
-              radius={[10, 10, 0, 0]} // Borda arredondada na parte superior
+              radius={[10, 10, 0, 0]}
             />
           ))}
         </BarChart>
